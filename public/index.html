@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeekMagic Market Monitor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="logo-icon">📈</div>
+        <div>
+          <h1>GeekMagic <span>Market Monitor</span></h1>
+          <p class="subtitle">Monitor financeiro de criptomoedas, ações e câmbio em tempo real</p>
+        </div>
+      </div>
+      <div class="status-badge" id="systemStatusBadge">
+        <span class="status-dot"></span>
+        <span class="status-text">PARADO</span>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="dashboard-grid">
+      <!-- Coluna da Esquerda: Controle & Preview do Relógio -->
+      <section class="card preview-card">
+        <div class="card-header">
+          <h2>📺 Espelho do Relógio Físico</h2>
+          <span class="badge-mini">240 × 240 IPS</span>
+        </div>
+
+        <!-- Seletor de Layouts Visuais -->
+        <div class="layout-selection-box">
+          <label class="section-label">Estilo de Layout da Tela:</label>
+          <div class="layout-switcher">
+            <button class="btn-layout active" data-layout="fintech" title="Gráfico suave com pílulas e métricas">
+              📊 Fintech
+            </button>
+            <button class="btn-layout" data-layout="minimal" title="Foco em números gigantes para ver de longe">
+              🔲 Minimalista
+            </button>
+            <button class="btn-layout" data-layout="trader" title="Terminal Bloomberg / TradingView com velas e grade">
+              ⚡ Trader Pro
+            </button>
+          </div>
+        </div>
+
+        <div class="clock-bezel-frame">
+          <div class="clock-screen">
+            <img id="livePreviewImg" src="/api/preview.jpg" alt="Preview da Tela">
+            <div class="screen-overlay" id="screenOverlay">
+              <span>AGUARDANDO INÍCIO</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles Principais -->
+        <div class="controls-action-box">
+          <button id="btnStart" class="btn btn-primary">
+            <span class="btn-icon">▶</span> INICIAR MONITORAMENTO
+          </button>
+          <button id="btnStop" class="btn btn-secondary" disabled>
+            <span class="btn-icon">⏹</span> PARAR & RESTAURAR RELÓGIO
+          </button>
+        </div>
+
+        <!-- Feedback Info -->
+        <div class="feed-info">
+          <div class="info-row">
+            <span class="info-label">Ativo exibido agora:</span>
+            <span class="info-val" id="lblCurrentAsset">--</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Última atualização:</span>
+            <span class="info-val" id="lblLastUpdate">--</span>
+          </div>
+          <div class="info-row" id="rowError" style="display: none;">
+            <span class="info-label" style="color: #f85149;">Status:</span>
+            <span class="info-val" id="lblError" style="color: #f85149;">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Coluna da Direita: Ativos & Configurações -->
+      <section class="card assets-card">
+        <div class="card-header">
+          <div class="header-left">
+            <h2>📊 Ativos Monitorados (<span id="assetCount">0</span>)</h2>
+          </div>
+          <button id="btnOpenAddModal" class="btn btn-outline btn-sm">
+            ➕ Adicionar Ativo
+          </button>
+        </div>
+
+        <div class="assets-scroll-container">
+          <div class="assets-grid" id="assetsContainer">
+            <!-- Cards de ativos injetados via JS -->
+          </div>
+        </div>
+
+        <!-- Configurações Rápidas -->
+        <div class="quick-settings-box">
+          <h3>⚙️ Configurações de Conexão</h3>
+          <div class="settings-form">
+            <div class="form-group">
+              <label for="inputClockIp">IP do Relógio:</label>
+              <div class="input-with-btn">
+                <input type="text" id="inputClockIp" value="192.168.1.2" placeholder="192.168.1.2">
+                <button id="btnTestClock" class="btn btn-sm btn-outline">Testar Conexão</button>
+                <button id="btnScanIp" class="btn btn-sm btn-outline" title="Localiza automaticamente o IP do relógio na rede Wi-Fi">🔍 Auto-Detectar</button>
+                <button id="btnCleanSlots" class="btn btn-sm btn-outline" title="Desmarca as 4 fotos de fábrica (astronauta, etc.) no relógio">🧹 Desmarcar Fotos de Fábrica</button>
+                <button id="btnRestartClock" class="btn btn-sm btn-outline" style="border-color: #d29922; color: #f0883e;" title="Reinicia o aparelho GeekMagic">🔄 Reiniciar Relógio</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputInterval">Intervalo de Rotação (segundos):</label>
+              <input type="number" id="inputInterval" value="15" min="5" max="300">
+            </div>
+            <button id="btnSaveConfig" class="btn btn-secondary btn-sm" style="align-self: flex-end;">
+              💾 Salvar Configurações
+            </button>
+          </div>
+          <div id="clockTestResult" class="test-feedback"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar Ativo -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>➕ Adicionar Novo Ativo</h3>
+        <button class="modal-close" id="btnCloseModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Presets Rápidos -->
+        <label class="section-label">Sugestões Populares (Clique para adicionar):</label>
+        <div class="presets-cloud">
+          <button class="preset-chip preset-brl" data-type="crypto" data-sym="ADABRL" data-name="Cardano (BRL)" data-curr="BRL">₳ Cardano (R$)</button>
+          <button class="preset-chip preset-brl" data-type="crypto" data-sym="BTCBRL" data-name="Bitcoin (BRL)" data-curr="BRL">₿ Bitcoin (R$)</button>
+          <button class="preset-chip preset-brl" data-type="crypto" data-sym="ETHBRL" data-name="Ethereum (BRL)" data-curr="BRL">Ξ Ethereum (R$)</button>
+          <button class="preset-chip preset-brl" data-type="crypto" data-sym="SOLBRL" data-name="Solana (BRL)" data-curr="BRL">◎ Solana (R$)</button>
+          <button class="preset-chip" data-type="crypto" data-sym="BTCUSDT" data-name="Bitcoin" data-curr="USD">₿ Bitcoin ($)</button>
+          <button class="preset-chip" data-type="crypto" data-sym="ADAUSDT" data-name="Cardano" data-curr="USD">₳ Cardano ($)</button>
+          <button class="preset-chip" data-type="crypto" data-sym="ETHUSDT" data-name="Ethereum" data-curr="USD">Ξ Ethereum ($)</button>
+          <button class="preset-chip" data-type="crypto" data-sym="SOLUSDT" data-name="Solana" data-curr="USD">◎ Solana ($)</button>
+          <button class="preset-chip" data-type="fiat" data-sym="USD-BRL" data-name="Dólar" data-curr="BRL">$ Dólar BRL</button>
+          <button class="preset-chip" data-type="fiat" data-sym="EUR-BRL" data-name="Euro" data-curr="BRL">€ Euro BRL</button>
+          <button class="preset-chip" data-type="stock" data-sym="PETR4.SA" data-name="Petrobras" data-curr="BRL">⛽ Petrobras (PETR4)</button>
+          <button class="preset-chip" data-type="stock" data-sym="VALE3.SA" data-name="Vale" data-curr="BRL">⛏ Vale (VALE3)</button>
+          <button class="preset-chip" data-type="stock" data-sym="ITUB4.SA" data-name="Itaú" data-curr="BRL">🏦 Itaú (ITUB4)</button>
+          <button class="preset-chip" data-type="stock" data-sym="^BVSP" data-name="Ibovespa" data-curr="PTS">📈 Ibovespa</button>
+          <button class="preset-chip" data-type="stock" data-sym="NVDA" data-name="Nvidia" data-curr="USD">🤖 Nvidia (NVDA)</button>
+          <button class="preset-chip" data-type="stock" data-sym="AAPL" data-name="Apple" data-curr="USD">🍎 Apple (AAPL)</button>
+        </div>
+
+        <div class="divider"><span>OU DIGITE MANUALMENTE</span></div>
+
+        <!-- Formulário Manual -->
+        <form id="formAddAsset" class="custom-form">
+          <div class="form-group">
+            <label for="assetType">Categoria:</label>
+            <select id="assetType">
+              <option value="crypto">Criptomoeda (Ex: ADA, BTC, ETH - conecta direto na Binance)</option>
+              <option value="fiat">Câmbio / Moeda (Ex: USD-BRL, EUR-BRL)</option>
+              <option value="stock">Ação / Índice (Ex: PETR4.SA, VALE3.SA, ^BVSP, AAPL)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="assetSymbol">Símbolo / Ticker:</label>
+            <input type="text" id="assetSymbol" placeholder="Ex: ADA, BTC, PETR4.SA ou USD-BRL" required>
+            <small style="color: var(--text-secondary); font-size: 11px;">Para criptos: Digite ADA, BTC ou SOL. Se escolher Real (BRL), o sistema converte para o par em Reais automaticamente!</small>
+          </div>
+          <div class="form-group">
+            <label for="assetName">Nome de Exibição:</label>
+            <input type="text" id="assetName" placeholder="Ex: Cardano, Bitcoin, Petrobras" required>
+          </div>
+          <div class="form-group">
+            <label for="assetCurrency">Moeda de Cotação:</label>
+            <select id="assetCurrency">
+              <option value="USD">Dólar ($ USD)</option>
+              <option value="BRL">Real (R$ BRL)</option>
+              <option value="PTS">Pontos (pts - para Índices)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Adicionar à Lista</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

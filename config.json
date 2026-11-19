@@ -1,0 +1,78 @@
+{
+  "clock_ip": "192.168.1.2",
+  "rotation_interval_seconds": 10,
+  "theme_restore": 0,
+  "layout": "trader",
+  "assets": [
+    {
+      "id": "BTC",
+      "type": "crypto",
+      "symbol": "BTCUSDT",
+      "name": "Bitcoin",
+      "currency": "USD"
+    },
+    {
+      "id": "ADA",
+      "type": "crypto",
+      "symbol": "ADAUSDT",
+      "name": "Cardano",
+      "currency": "USD"
+    },
+    {
+      "id": "ETH",
+      "type": "crypto",
+      "symbol": "ETHUSDT",
+      "name": "Ethereum",
+      "currency": "USD"
+    },
+    {
+      "id": "SOL",
+      "type": "crypto",
+      "symbol": "SOLUSDT",
+      "name": "Solana",
+      "currency": "USD"
+    },
+    {
+      "id": "USD",
+      "type": "fiat",
+      "symbol": "USD-BRL",
+      "name": "Dólar Comercial",
+      "currency": "BRL"
+    },
+    {
+      "id": "EUR",
+      "type": "fiat",
+      "symbol": "EUR-BRL",
+      "name": "Euro",
+      "currency": "BRL"
+    },
+    {
+      "id": "PETR4",
+      "type": "stock",
+      "symbol": "PETR4.SA",
+      "name": "Petrobras PN",
+      "currency": "BRL"
+    },
+    {
+      "id": "VALE3",
+      "type": "stock",
+      "symbol": "VALE3.SA",
+      "name": "Vale ON",
+      "currency": "BRL"
+    },
+    {
+      "id": "IBOV",
+      "type": "stock",
+      "symbol": "^BVSP",
+      "name": "Ibovespa",
+      "currency": "PTS"
+    },
+    {
+      "id": "ADABRL",
+      "type": "crypto",
+      "symbol": "ADABRL",
+      "name": "Cardano (BRL)",
+      "currency": "BRL"
+    }
+  ]
+}
