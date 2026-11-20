@@ -34,7 +34,10 @@ async function uploadImageToClock(clockIp, imageBuffer) {
       `http://${clockIp}/upload`
     ];
 
-    execFile('curl.exe', args, { cwd: __dirname }, async (err, stdout, stderr) => {
+    // Compatibilidade multiplataforma (Windows usa curl.exe, Termux/Linux usa curl)
+    const curlBin = process.platform === 'win32' ? 'curl.exe' : 'curl';
+
+    execFile(curlBin, args, { cwd: __dirname }, async (err, stdout, stderr) => {
       const output = (stdout || '') + (stderr || '');
       // O ESP8266 pode fechar a conexão logo após enviar "Upload successful!"
       const isOk = !err || output.includes('Upload successful!') || (err.code === 18 && output.includes('Upload successful!'));
@@ -117,21 +120,22 @@ async function restartClock(clockIp) {
     }
   } catch (_) {}
 
-  // 2. Aciona o Hardware Reset via porta Serial USB (COM7) com pulso DTR/RTS
-  // Isso funciona SEMPRE, mesmo com o Wi-Fi travado ou desconectado!
-  try {
-    const psScript = path.join(__dirname, 'reset_serial.ps1');
-    if (fs.existsSync(psScript)) {
-      await new Promise((resolve) => {
-        execFile('powershell.exe', ['-ExecutionPolicy', 'Bypass', '-File', psScript, '-Port', 'COM7'], (err, stdout) => {
-          if (!err && stdout && stdout.includes('SUCCESS')) {
-            hwTriggered = true;
-          }
-          resolve();
+  // 2. Aciona o Hardware Reset via porta Serial USB no Windows com pulso DTR/RTS
+  if (process.platform === 'win32') {
+    try {
+      const psScript = path.join(__dirname, 'reset_serial.ps1');
+      if (fs.existsSync(psScript)) {
+        await new Promise((resolve) => {
+          execFile('powershell.exe', ['-ExecutionPolicy', 'Bypass', '-File', psScript, '-Port', 'COM7'], (err, stdout) => {
+            if (!err && stdout && stdout.includes('SUCCESS')) {
+              hwTriggered = true;
+            }
+            resolve();
+          });
         });
-      });
-    }
-  } catch (_) {}
+      }
+    } catch (_) {}
+  }
 
   return {
     success: true,

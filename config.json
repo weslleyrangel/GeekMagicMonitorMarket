@@ -2,7 +2,7 @@
   "clock_ip": "192.168.1.2",
   "rotation_interval_seconds": 10,
   "theme_restore": 0,
-  "layout": "trader",
+  "layout": "fintech",
   "assets": [
     {
       "id": "BTC",
