@@ -61,19 +61,18 @@ flowchart TD
 
 ---
 
-## 4. O Passo Mais Importante: Backup Completo da Fábrica
+## 4. Backup Completo de Fábrica Realizado com Sucesso ✅
 
-> [!CAUTION]
-> **Antes de qualquer tentativa de gravação, faremos o backup binário integral (Dump) da Flash original.**
-> Com o arquivo `.bin` de fábrica salvo no seu computador, o risco de "brickar" o aparelho é **zero**, pois basta regravar o dump original e ele volta exatamente ao estado de fábrica da GeekMagic.
+> [!NOTE]
+> **Status:** O dump completo de 4MB da memória Flash de fábrica foi extraído com sucesso através da porta `COM7` usando o `esptool.exe v5.6.0` oficial!
+> * **Arquivo de Backup:** `firmware/backups/backup_original_geekmagic_4MB.bin`
+> * **Tamanho:** Exatos **4.194.304 bytes** (4 MB).
+> * **Chip Identificado:** ESP8266EX (Wi-Fi, 160MHz, Flash de 4MB, MAC: `c4:d8:d5:35:0f:4f`).
+> * **Script de Restauração em 1 Clique:** Criado o utilitário [restaurar_backup_original.bat](../../firmware/restaurar_backup_original.bat) para voltar ao estado de fábrica a qualquer momento com segurança.
 
-### Comando de Backup via `esptool.py`:
+### Comando Utilizado para Extração:
 ```bash
-# 1. Identificar o chip e tamanho da Flash
-esptool.py --port COMx flash_id
-
-# 2. Fazer a cópia idêntica de toda a memória (4MB)
-esptool.py --port COMx read_flash 0x0 0x400000 backup_original_geekmagic.bin
+tools\esptool\esptool-windows-amd64\esptool.exe --port COM7 --baud 460800 read-flash 0x0 0x400000 firmware\backups\backup_original_geekmagic_4MB.bin
 ```
 
 ---
