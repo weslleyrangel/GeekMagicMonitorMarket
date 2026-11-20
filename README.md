@@ -75,6 +75,42 @@ O monitor suporta **3 layouts visuais exclusivos** com alternância em 1 clique 
 
 ---
 
+## 🐳 Executando com Docker e Docker Compose
+
+Se preferir rodar em segundo plano dentro de um container Docker (em um servidor local, mini-PC ou Raspberry Pi):
+
+1. **Subir com Docker Compose:**
+   ```bash
+   docker compose up -d --build
+   ```
+
+2. **Ver logs:**
+   ```bash
+   docker compose logs -f
+   ```
+
+3. **Parar o container:**
+   ```bash
+   docker compose down
+   ```
+
+---
+
+## ☸️ Orquestrando com Kubernetes (K8s / K3s)
+
+Para rodar em um cluster Kubernetes local (K3s, MicroK8s ou cluster dedicado):
+
+```bash
+# Aplica o manifesto de Deployment e Service NodePort
+kubectl apply -f k8s/deployment.yaml
+
+# Acompanhe o status do pod
+kubectl get pods -l app=geekmagic-monitor -w
+```
+Acesse pelo tablet ou PC em: `http://IP_DO_NODE:30333`
+
+---
+
 ## ⚙️ Configuração Inicial do Relógio
 
 1. No painel, insira o **IP do Relógio** (ex: `192.168.1.2`) ou clique em **Auto-Detectar**.
