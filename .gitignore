@@ -1,6 +1,12 @@
 # Dependências
 node_modules/
 
+# Ferramentas locais de gravação
+tools/
+
+# Backups de firmware locais (contêm credenciais de Wi-Fi e dados da Flash física)
+firmware/backups/*.bin
+
 # Arquivos temporários de imagem
 temp_frame.jpg
 temp_*.jpg
