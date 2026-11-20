@@ -120,11 +120,26 @@ Acesse pelo tablet ou PC em: `http://IP_DO_NODE:30333`
 
 ---
 
+## 📚 Documentação Completa
+
+Toda a documentação técnica, decisões arquiteturais, guias para tablet e análises de rede estão organizados na pasta [`docs/`](docs/README.md):
+
+* **[Guias Práticos](docs/README.md#-1-guias-práticos):** Passo a passo para rodar no tablet com Termux 24/7.
+* **[Arquitetura](docs/README.md#-2-arquitetura-e-decisões-técnicas):** Por que usamos a abordagem Thin-Client e estudos de firmwares alternativos.
+* **[Rede & Troubleshooting](docs/README.md#-3-rede-conectividade-e-resolução-de-problemas):** Resoluções de Wi-Fi, Brisanet e correção de travamentos.
+* **[Histórico de Evolução](docs/README.md#-4-histórico-de-evolução-do-projeto):** Planos detalhados e walkthroughs de cada fase.
+
+---
+
 ## 📁 Estrutura do Projeto
 
 ```
 GeekMagicMonitor/
 ├── Iniciar_Monitor.bat     # Inicializador automático para Windows
+├── Dockerfile              # Imagem Docker leve (node:20-slim)
+├── docker-compose.yml      # Execução local conteinerizada com volume
+├── k8s/                    # Manifestos de Deployment e Service Kubernetes
+├── docs/                   # Base completa de documentação técnica e guias
 ├── server.js               # Servidor Express, rotas da API e ciclo de rotação
 ├── market_service.js       # Coleta de dados (Binance, AwesomeAPI, Yahoo Finance) com cache
 ├── renderer.js             # Motor gráfico de renderização dos 3 layouts visuais (240x240)
