@@ -68,9 +68,13 @@ function normalizeCryptoSymbol(rawSym, currency = 'USD') {
   return sym;
 }
 
-async function fetchCryptoData(symbol) {
+// Cache em memória para evitar requisições redundantes e rate-limiting
+const quoteCache = new Map();
+const CACHE_TTL_MS = 12000; // 12 segundos de validade
+
+async function fetchCryptoData(symbol, currency = 'USD') {
   try {
-    const cleanSym = normalizeCryptoSymbol(symbol);
+    const cleanSym = normalizeCryptoSymbol(symbol, currency);
     const tickerRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${cleanSym}`, {
       signal: AbortSignal.timeout(5000)
     });
@@ -198,14 +202,32 @@ async function fetchStockData(symbol) {
 }
 
 async function getAssetQuote(asset) {
-  if (asset.type === 'crypto') {
-    return await fetchCryptoData(asset.symbol);
-  } else if (asset.type === 'fiat') {
-    return await fetchFiatData(asset.symbol);
-  } else if (asset.type === 'stock') {
-    return await fetchStockData(asset.symbol);
+  if (!asset || !asset.symbol) {
+    return { success: false, error: 'Ativo inválido ou sem símbolo' };
   }
-  return { success: false, error: 'Tipo de ativo desconhecido' };
+
+  const cacheKey = `${asset.type}:${asset.symbol}:${asset.currency || ''}`;
+  const cached = quoteCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
+
+  let result;
+  if (asset.type === 'crypto') {
+    result = await fetchCryptoData(asset.symbol, asset.currency);
+  } else if (asset.type === 'fiat') {
+    result = await fetchFiatData(asset.symbol);
+  } else if (asset.type === 'stock') {
+    result = await fetchStockData(asset.symbol);
+  } else {
+    result = { success: false, error: 'Tipo de ativo desconhecido' };
+  }
+
+  if (result.success) {
+    quoteCache.set(cacheKey, { timestamp: Date.now(), data: result });
+  }
+
+  return result;
 }
 
 module.exports = {

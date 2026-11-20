@@ -13,6 +13,8 @@ const http = require('http');
 const LOCAL_FRAME = 'temp_frame.jpg';
 const ABS_FRAME = path.join(__dirname, LOCAL_FRAME);
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function uploadImageToClock(clockIp, imageBuffer) {
   return new Promise((resolve) => {
     try {
@@ -26,14 +28,16 @@ async function uploadImageToClock(clockIp, imageBuffer) {
     const args = [
       '-s',
       '-H', 'Connection: close',
-      '--connect-timeout', '3',
-      '-m', '8',
+      '--connect-timeout', '6',
+      '-m', '10',
       '-F', `imageFile=@${LOCAL_FRAME};type=image/jpeg;filename=file1.jpg`,
       `http://${clockIp}/upload`
     ];
 
-    execFile('curl.exe', args, { cwd: __dirname }, async (err, stdout) => {
-      const isOk = !err || (stdout && stdout.includes('Upload successful!'));
+    execFile('curl.exe', args, { cwd: __dirname }, async (err, stdout, stderr) => {
+      const output = (stdout || '') + (stderr || '');
+      // O ESP8266 pode fechar a conexão logo após enviar "Upload successful!"
+      const isOk = !err || output.includes('Upload successful!') || (err.code === 18 && output.includes('Upload successful!'));
       if (!isOk) {
         return resolve({ 
           success: false, 
@@ -47,14 +51,20 @@ async function uploadImageToClock(clockIp, imageBuffer) {
 }
 
 // Desativa automaticamente as caixas 2, 3, 4 e 5 e ativa a caixa 1
+// com pausas de 200ms para não travar a memória Flash do microcontrolador ESP8266
 async function cleanClockSlots(clockIp) {
   try {
     console.log(`[Configuração Automática] Limpando slots de fábrica no relógio ${clockIp}...`);
     await httpGet(`http://${clockIp}/file1-switch?getstate=1`);
+    await sleep(200);
     await httpGet(`http://${clockIp}/file2-switch?getstate=0`);
+    await sleep(200);
     await httpGet(`http://${clockIp}/file3-switch?getstate=0`);
+    await sleep(200);
     await httpGet(`http://${clockIp}/file4-switch?getstate=0`);
+    await sleep(200);
     await httpGet(`http://${clockIp}/file5-switch?getstate=0`);
+    await sleep(200);
     await httpGet(`http://${clockIp}/themeselect?getstate=2`);
     console.log(`[Configuração Automática] Concluído: Apenas file1 ativo em modo Photo.`);
     return { success: true };

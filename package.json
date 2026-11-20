@@ -1,17 +1,26 @@
 {
-  "name": "geekmagicmonitor",
+  "name": "geekmagic-market-monitor",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Painel de controle e monitoramento financeiro em tempo real para relógios inteligentes GeekMagic SmallTV.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "geekmagic",
+    "smalltv",
+    "crypto",
+    "bitcoin",
+    "stocks",
+    "b3",
+    "finance",
+    "esp8266",
+    "iot"
+  ],
+  "author": "Weslley Bezerril",
+  "license": "MIT",
   "dependencies": {
     "@napi-rs/canvas": "^1.1.1",
-    "express": "^5.3.0",
-    "form-data": "^4.0.6"
+    "express": "^5.3.0"
   }
 }

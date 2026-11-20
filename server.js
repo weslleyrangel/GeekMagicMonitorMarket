@@ -140,6 +140,8 @@ app.post('/api/start', async (req, res) => {
   // 1. Desmarca obrigatoriamente as fotos de fábrica 2 a 5 antes de rodar o loop
   try {
     await cleanClockSlots(config.clock_ip);
+    // Pausa de 1.5s para o relógio consolidar as gravações e transitar suavemente para o modo Photo
+    await new Promise(r => setTimeout(r, 1500));
   } catch (err) {
     console.warn('Aviso ao desmarcar slots de fábrica:', err.message);
   }
@@ -346,10 +348,17 @@ app.get('/api/preview.jpg', (req, res) => {
     return res.send(latestPreviewBuffer);
   }
 
-  const samplePath = path.join(__dirname, 'sample_btc.jpg');
-  if (fs.existsSync(samplePath)) {
-    res.set('Content-Type', 'image/jpeg');
-    return res.sendFile(samplePath);
+  // Gera frame sob demanda se ainda não houver nenhum
+  if (config.assets && config.assets.length > 0) {
+    try {
+      const asset = config.assets[0];
+      const placeholder = { price: 0, changePct: 0, high: 0, low: 0, open: 0, history: [0, 0] };
+      const meta = { index: 0, total: config.assets.length, nextName: '' };
+      const buf = renderAssetScreen(asset, placeholder, meta, config.layout || 'fintech');
+      res.set('Content-Type', 'image/jpeg');
+      res.set('Cache-Control', 'no-store');
+      return res.send(buf);
+    } catch (_) {}
   }
 
   res.status(404).send('Preview não disponível ainda.');

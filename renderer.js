@@ -399,6 +399,10 @@ function renderAssetScreen(asset, quote, meta = {}, layout = 'fintech') {
     renderFintechLayout(ctx, asset, quote, meta);
   }
 
+  // Compactação equilibrada (qualidade 72) ideal para o display 240x240 e buffer do ESP8266
+  if (canvas.encodeSync) {
+    return canvas.encodeSync('jpeg', 72);
+  }
   return canvas.toBuffer('image/jpeg');
 }
 
